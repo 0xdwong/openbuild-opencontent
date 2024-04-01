@@ -1,4 +1,4 @@
-name: Fetch Web pages
+name: Fetch server_render web pages
 on:
     issues:
         types:
