@@ -1,0 +1,33 @@
+name: Fetch Web pages
+on:
+    issues:
+        types:
+            - labeled
+jobs:
+    Fetch-and-Save:
+        if: github.event.label.name == 'translation'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            issues: write
+        steps:
+            - uses: actions/checkout@v3
+
+            - uses: pnpm/action-setup@v2
+              with:
+                  version: 8
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: pnpm
+            - uses: browser-actions/setup-chrome@v1
+
+            - name: Setup Web-fetch
+              run: pnpm i web-fetch -g
+
+            - name: Fetch first URL in Issue Body
+              run: web-fetch $(echo "${{ github.event.issue.Body }}" | grep -Eo "https?://\S+")
+
+            - uses: stefanzweifel/git-auto-commit-action@v5
+              with:
+                  commit_message: '${{ github.event.issue.title }}'
